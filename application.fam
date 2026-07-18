@@ -1,0 +1,11 @@
+App(
+    appid="subghz_looper",
+    name="Sub-GHz Looper",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="subghz_looper_main",
+    stack_size=4 * 1024,
+    fap_icon="app.png",
+    fap_category="Sub-GHz",
+    fap_description="Replay saved Sub-GHz captures on a repeating timer",
+    fap_version="1.0",
+)

@@ -1,0 +1,8 @@
+.DS_Store
+
+# Local Python venv used to run ufbt (see README's Development section)
+.venv/
+
+# ufbt build output
+.vscode/
+dist/
