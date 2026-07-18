@@ -44,7 +44,7 @@ uint32_t SubGhzLooperInterval::callbackToSubmenu(void *context)
 void SubGhzLooperInterval::updateValueText()
 {
     SubGhzLooperApp *app = static_cast<SubGhzLooperApp *>(appContext);
-    char buf[8];
+    char buf[16];
     snprintf(buf, sizeof(buf), "%d", static_cast<int>(app->intervalValue));
     variable_item_set_current_value_text(variable_item_value, buf);
 }

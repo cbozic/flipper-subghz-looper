@@ -136,7 +136,7 @@ void SubGhzLooperFiles::updateDraw(Canvas *canvas)
         return;
     }
 
-    char counter[16];
+    char counter[24];
     snprintf(counter, sizeof(counter), "%u/%u", (unsigned)(focusIndex + 1), (unsigned)fileCount);
     canvas_draw_str_aligned(canvas, 126, 10, AlignRight, AlignBottom, counter);
 
@@ -153,7 +153,8 @@ void SubGhzLooperFiles::updateDraw(Canvas *canvas)
             canvas_set_color(canvas, ColorWhite);
         }
 
-        char line[96];
+        // Sized to hold the 4-char checkbox prefix + a full-length filename + NUL
+        char line[kMaxNameLength + 8];
         snprintf(line, sizeof(line), "%s %s", fileChecked[idx] ? "[x]" : "[ ]", fileNames[idx]);
         canvas_draw_str(canvas, 4, y, line);
 

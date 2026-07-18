@@ -185,7 +185,7 @@ void SubGhzLooperRun::updateDraw(Canvas *canvas)
         batteryPct = furi_hal_power_get_pct();
         batteryTick = now;
     }
-    char battery[8];
+    char battery[16];
     snprintf(battery, sizeof(battery), "%u%%", (unsigned)batteryPct);
     canvas_draw_str_aligned(canvas, 126, 10, AlignRight, AlignBottom, battery);
 
