@@ -4,6 +4,7 @@
 #include "subghz_tx/subghz_tx.h"
 #include "run/run.hpp"
 #include "interval/interval.hpp"
+#include "led/led.hpp"
 #include "files/files.hpp"
 #include "about/about.hpp"
 
@@ -16,8 +17,9 @@ typedef enum
 {
     SubGhzLooperSubmenuFiles = 0,
     SubGhzLooperSubmenuInterval = 1,
-    SubGhzLooperSubmenuRun = 2,
-    SubGhzLooperSubmenuAbout = 3,
+    SubGhzLooperSubmenuLed = 2,
+    SubGhzLooperSubmenuRun = 3,
+    SubGhzLooperSubmenuAbout = 4,
 } SubGhzLooperSubmenuIndex;
 
 typedef enum
@@ -26,6 +28,7 @@ typedef enum
     SubGhzLooperViewSubmenu = 1,
     SubGhzLooperViewAbout = 2,
     SubGhzLooperViewInterval = 3,
+    SubGhzLooperViewLed = 4,
 } SubGhzLooperView;
 
 typedef enum
@@ -39,6 +42,7 @@ private:
     std::unique_ptr<SubGhzLooperAbout> about;       // About class instance
     std::unique_ptr<SubGhzLooperFiles> files;       // Files class instance (custom full-screen view)
     std::unique_ptr<SubGhzLooperInterval> interval; // Interval settings class instance
+    std::unique_ptr<SubGhzLooperLed> led;           // LED-on-broadcast settings class instance
     std::unique_ptr<SubGhzLooperRun> run;           // Run class instance (custom full-screen view)
     Submenu *submenu = nullptr;                     // Submenu for the app
     SubGhzTx *subghzTx = nullptr;                   // Radio TX driver, allocated once and shared across Run sessions
@@ -65,6 +69,9 @@ public:
     // persisted once at exit (avoids an SD write on every value change).
     int32_t intervalValue = 5; // 1..255
     uint8_t intervalUnit = 1;  // 0=Seconds, 1=Minutes, 2=Hours
+    //
+    // LED-on-broadcast setting: same in-memory/persist-once pattern as the interval setting.
+    bool ledOnBroadcast = false; // off by default (preserves current no-LED behavior)
     //
     SubGhzTx *acquireSubGhzTx();                                                                                // lazily allocate (once) and return the shared radio TX driver
     bool loadChar(const char *path_name, char *value, size_t value_size, const char *appId = APP_ID);           // load a string from storage

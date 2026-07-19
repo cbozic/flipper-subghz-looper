@@ -3,6 +3,7 @@
 #include "subghz_tx/subghz_tx.h"
 
 #include <furi_hal_power.h>
+#include <notification/notification_messages.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,9 +18,15 @@ SubGhzLooperRun::SubGhzLooperRun(void *appContext) : appContext(appContext)
 {
     loadSelectedFiles();
     loadIntervalSeconds();
+    loadLedSetting();
 
     // Borrow the app-owned radio driver (allocated once, shared across Run sessions)
     tx = static_cast<SubGhzLooperApp *>(appContext)->acquireSubGhzTx();
+
+    if (ledOnBroadcast)
+    {
+        notifications = static_cast<NotificationApp *>(furi_record_open(RECORD_NOTIFICATION));
+    }
 
     thread = furi_thread_alloc();
     furi_thread_set_name(thread, "SubGhzLooperWorker");
@@ -40,6 +47,12 @@ SubGhzLooperRun::~SubGhzLooperRun()
     }
     // tx is owned by the app; do not free it here.
     tx = nullptr;
+
+    if (notifications)
+    {
+        furi_record_close(RECORD_NOTIFICATION);
+        notifications = nullptr;
+    }
 }
 
 int32_t SubGhzLooperRun::workerThreadTrampoline(void *context)
@@ -76,6 +89,10 @@ void SubGhzLooperRun::workerThreadMain()
             uint32_t sent = 0;
             uint32_t failed = 0;
             isTransmitting = true;
+            if (notifications)
+            {
+                notification_message(notifications, &sequence_blink_start_red);
+            }
             for (size_t i = 0; i < fileCount; i++)
             {
                 if (ctlRequestExit || ctlPause)
@@ -90,6 +107,10 @@ void SubGhzLooperRun::workerThreadMain()
                 {
                     failed++;
                 }
+            }
+            if (notifications)
+            {
+                notification_message(notifications, &sequence_blink_stop);
             }
             isTransmitting = false;
 
@@ -174,6 +195,12 @@ void SubGhzLooperRun::loadIntervalSeconds()
     {
         intervalSeconds = 1;
     }
+}
+
+void SubGhzLooperRun::loadLedSetting()
+{
+    SubGhzLooperApp *app = static_cast<SubGhzLooperApp *>(appContext);
+    ledOnBroadcast = app->ledOnBroadcast;
 }
 
 void SubGhzLooperRun::updateDraw(Canvas *canvas)

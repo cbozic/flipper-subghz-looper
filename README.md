@@ -20,14 +20,16 @@ often to re-send them, and it will rebroadcast them in a loop until you stop it.
 
 ## Using the app on the device
 
-The app installs under **Apps → Sub-GHz → Sub-GHz Looper**. The main menu has four entries:
+The app installs under **Apps → Sub-GHz → Sub-GHz Looper**. The main menu has five entries:
 
 1. **Select Files** — a checklist of every `.sub` file directly under `/ext/subghz`.
    - **Up/Down** move the cursor, **OK** toggles a file's `[x]`, **Back** saves the
      selection and returns to the menu.
 2. **Interval** — how long to wait between one broadcast cycle and the next.
    - Set an integer **Interval** value (1–255) and a **Unit** of Seconds, Minutes, or Hours.
-3. **Run** — starts the loop **immediately**:
+3. **LED on Broadcast** — toggle **On**/**Off** (default **Off**). When on, the Flipper's LED
+   blinks red for the duration of each broadcast cycle, off the rest of the time.
+4. **Run** — starts the loop **immediately**:
    - It broadcasts every selected file once, right away.
    - Then it counts down the interval (`Next in: Xs`) and rebroadcasts when it reaches zero,
      repeating until you leave.
@@ -35,10 +37,11 @@ The app installs under **Apps → Sub-GHz → Sub-GHz Looper**. The main menu ha
    - The circle in the top-right is an activity indicator: **filled** while a signal is
      actively broadcasting, **hollow** while idle/waiting. After each cycle the screen shows
      `Last: N sent, M FAILED` so you can see whether anything failed to transmit.
-4. **About** — a short description of the app.
+5. **About** — a short description of the app.
 
-**Persistence:** your file selection is saved when you leave the Select Files screen, and
-the interval setting is saved when you exit the app. Both are restored on the next launch.
+**Persistence:** your file selection is saved when you leave the Select Files screen, and the
+interval and LED-on-broadcast settings are saved when you exit the app. All are restored on
+the next launch.
 
 ## Requirements
 
@@ -120,6 +123,7 @@ app.cpp / app.hpp      App shell: menu, view dispatcher, shared radio, teardown
 about/                 About screen
 files/                 "Select Files" checklist view (scans /ext/subghz)
 interval/              "Interval" settings view (value + unit)
+led/                   "LED on Broadcast" settings view (on/off toggle)
 run/                   "Run" view + background worker thread that drives the loop
 subghz_tx/             Radio driver: loads a .sub file and transmits it (internal CC1101)
 easy_flipper/          Small helpers for allocating GUI views (from the starter template)

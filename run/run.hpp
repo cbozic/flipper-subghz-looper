@@ -24,6 +24,11 @@ private:
     FuriThread *thread = nullptr; // background worker thread
     SubGhzTx *tx = nullptr;       // radio TX driver instance (borrowed from the app, not owned)
 
+    // LED-on-broadcast: cached copy of the app setting (read once at construction) and the
+    // notification service handle used to blink the LED, only opened when the setting is on.
+    bool ledOnBroadcast = false;
+    NotificationApp *notifications = nullptr;
+
     // Battery reading is cached (GUI-thread only) so we don't hit the fuel gauge every redraw
     uint8_t batteryPct = 0;   // last-read battery percentage
     uint32_t batteryTick = 0; // furi tick of the last read (0 = never read yet)
@@ -37,6 +42,7 @@ private:
     void workerThreadMain();
     void loadSelectedFiles();
     void loadIntervalSeconds();
+    void loadLedSetting();
 
 public:
     SubGhzLooperRun(void *appContext);

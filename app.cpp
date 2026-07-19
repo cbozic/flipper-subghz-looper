@@ -26,6 +26,7 @@ SubGhzLooperApp::SubGhzLooperApp()
 
     submenu_add_item(submenu, "Select Files", SubGhzLooperSubmenuFiles, submenuChoicesCallback, this);
     submenu_add_item(submenu, "Interval", SubGhzLooperSubmenuInterval, submenuChoicesCallback, this);
+    submenu_add_item(submenu, "LED on Broadcast", SubGhzLooperSubmenuLed, submenuChoicesCallback, this);
     submenu_add_item(submenu, "Run", SubGhzLooperSubmenuRun, submenuChoicesCallback, this);
     submenu_add_item(submenu, "About", SubGhzLooperSubmenuAbout, submenuChoicesCallback, this);
 
@@ -49,6 +50,10 @@ SubGhzLooperApp::SubGhzLooperApp()
             intervalUnit = static_cast<uint8_t>(parsed);
         }
     }
+    if (loadChar("led_on_broadcast", buf, sizeof(buf)))
+    {
+        ledOnBroadcast = (atoi(buf) != 0);
+    }
 
     // Switch to the submenu view
     view_dispatcher_switch_to_view(viewDispatcher, SubGhzLooperViewSubmenu);
@@ -62,6 +67,8 @@ SubGhzLooperApp::~SubGhzLooperApp()
     saveChar("interval_value", buf);
     snprintf(buf, sizeof(buf), "%d", static_cast<int>(intervalUnit));
     saveChar("interval_unit", buf);
+    snprintf(buf, sizeof(buf), "%d", ledOnBroadcast ? 1 : 0);
+    saveChar("led_on_broadcast", buf);
 
     // Stop and free timer first
     if (timer)
@@ -95,6 +102,12 @@ SubGhzLooperApp::~SubGhzLooperApp()
     if (interval)
     {
         interval.reset();
+    }
+
+    // Clean up led
+    if (led)
+    {
+        led.reset();
     }
 
     // Clean up about
@@ -150,6 +163,13 @@ void SubGhzLooperApp::callbackSubmenuChoices(uint32_t index)
             interval = std::make_unique<SubGhzLooperInterval>(&viewDispatcher, this);
         }
         view_dispatcher_switch_to_view(viewDispatcher, SubGhzLooperViewInterval);
+        break;
+    case SubGhzLooperSubmenuLed:
+        if (!led)
+        {
+            led = std::make_unique<SubGhzLooperLed>(&viewDispatcher, this);
+        }
+        view_dispatcher_switch_to_view(viewDispatcher, SubGhzLooperViewLed);
         break;
     case SubGhzLooperSubmenuRun:
         run = std::make_unique<SubGhzLooperRun>(this);
