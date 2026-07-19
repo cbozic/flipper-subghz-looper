@@ -127,7 +127,6 @@ led/                   "LED on Broadcast" settings view (on/off toggle)
 run/                   "Run" view + background worker thread that drives the loop
 subghz_tx/             Radio driver: loads a .sub file and transmits it (internal CC1101)
 easy_flipper/          Small helpers for allocating GUI views (from the starter template)
-font/                  Font helpers (from the starter template)
 .devcontainer/         Alternative containerized dev environment (see below)
 ```
 

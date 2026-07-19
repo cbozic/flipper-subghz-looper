@@ -1,5 +1,4 @@
 #pragma once
-#include "font/font.h"
 #include "easy_flipper/easy_flipper.h"
 #include "subghz_tx/subghz_tx.h"
 #include "run/run.hpp"
