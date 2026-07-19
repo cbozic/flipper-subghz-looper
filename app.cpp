@@ -276,7 +276,12 @@ void SubGhzLooperApp::startCustomScreen()
     timer = furi_timer_alloc(timerCallback, FuriTimerTypePeriodic, this);
     if (timer)
     {
-        furi_timer_start(timer, 100); // redraw every 100ms
+        // 1 Hz is enough: the only thing that changes on its own is the
+        // second-granularity countdown (battery is cached, refreshed every 2s).
+        // Keypresses repaint immediately via viewPortInput, so interactivity does
+        // not depend on this rate. Redrawing faster only burns battery waking the
+        // CPU and refreshing the LCD during the (potentially hours-long) idle wait.
+        furi_timer_start(timer, 1000);
     }
 }
 
@@ -363,6 +368,11 @@ void SubGhzLooperApp::viewPortInput(InputEvent *event, void *context)
         {
             view_dispatcher_send_custom_event(app->viewDispatcher, SubGhzLooperCustomEventReturnToMenu);
         }
+        else if (app->viewPort)
+        {
+            // Repaint now so the keypress feels instant without a fast redraw timer
+            view_port_update(app->viewPort);
+        }
     }
     else if (app->run && app->run->isActive())
     {
@@ -370,6 +380,10 @@ void SubGhzLooperApp::viewPortInput(InputEvent *event, void *context)
         if (!app->run->isActive())
         {
             view_dispatcher_send_custom_event(app->viewDispatcher, SubGhzLooperCustomEventReturnToMenu);
+        }
+        else if (app->viewPort)
+        {
+            view_port_update(app->viewPort);
         }
     }
 }

@@ -59,10 +59,11 @@ void SubGhzLooperRun::workerThreadMain()
 {
     while (!ctlRequestExit)
     {
-        // Wait here while paused
+        // Wait here while paused. Poll slowly: the screen is static while paused,
+        // and a resume/exit is still noticed within a fraction of a second.
         while (ctlPause && !ctlRequestExit)
         {
-            furi_delay_ms(50);
+            furi_delay_ms(200);
         }
         if (ctlRequestExit)
         {
@@ -107,13 +108,17 @@ void SubGhzLooperRun::workerThreadMain()
         }
 
         // Wait for the configured interval, checking for pause/exit as we go
+        // Poll at 250ms: the countdown only displays whole seconds and a redraw
+        // happens at 1 Hz, so a coarser poll keeps the counter accurate while
+        // waking the CPU far less over a long (minutes/hours) wait. Pause/exit is
+        // still noticed within 250ms.
         uint32_t intervalMs = intervalSeconds * 1000u;
         uint32_t waitedMs = 0;
         secondsRemaining = intervalSeconds;
         while (waitedMs < intervalMs && !ctlRequestExit && !ctlPause)
         {
-            furi_delay_ms(100);
-            waitedMs += 100;
+            furi_delay_ms(250);
+            waitedMs += 250;
             uint32_t remainingMs = (intervalMs > waitedMs) ? (intervalMs - waitedMs) : 0;
             secondsRemaining = (remainingMs + 999) / 1000;
         }
